@@ -18,14 +18,14 @@ public class UsuarioService {
 
     public Usuario updateUser(Usuario updateUser) {
         try {
-            if (updateUser.getUsername().isBlank() || updateUser.getEmail().isBlank() ||
+            if (updateUser.getUsername().isBlank() || updateUser.getNickname().isBlank() ||
                     updateUser.getPassword().isBlank()) {
                 throw new NullPointerException("field cannot be empty");
             }
         } catch (Exception e) {
             throw new NullPointerException("field cannot be empty");
         }
-        if (!_emailValidator.test(updateUser.getEmail())) {
+        if (!_emailValidator.test(updateUser.getUsername())) {
             throw new IllegalArgumentException("email invalid");
         }
         Usuario oldUser = _usuarioRepository.findById(updateUser.getId()).orElseThrow();
@@ -36,7 +36,7 @@ public class UsuarioService {
     }
 
     public Usuario findUsuario(String email) {
-        Usuario result = _usuarioRepository.findAll().stream().filter(user -> user.getEmail().equals(email))
+        Usuario result = _usuarioRepository.findAll().stream().filter(user -> user.getUsername().equals(email))
                 .findFirst().orElseThrow(() -> new UsernameNotFoundException("email not found"));
         return result;
     }

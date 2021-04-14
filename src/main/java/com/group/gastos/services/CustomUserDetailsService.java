@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class RegistrationService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UsuarioRepository _usuarioRepository;
     private final EmailValidator _emailValidator;
@@ -29,19 +29,19 @@ public class RegistrationService implements UserDetailsService {
     public Usuario register(Usuario newUser) {
 
         try {
-            if (newUser.getUsername().isBlank() || newUser.getEmail().isBlank() || newUser.getPassword().isBlank()) {
+            if (newUser.getUsername().isBlank() || newUser.getNickname().isBlank() || newUser.getPassword().isBlank()) {
                 throw new NullPointerException("field cannot be empty");
             }
         } catch (Exception e) {
             throw new NullPointerException("field cannot be empty");
         }
-
-        if (_usuarioRepository.findAll().stream().anyMatch(s -> s.getUsername().equals(newUser.getUsername()))) {
-            throw new WrongMethodTypeException("username already in use");
-        }
-        if (!_emailValidator.test(newUser.getEmail())) {
+        if (!_emailValidator.test(newUser.getUsername())) {
             throw new IllegalArgumentException("email invalid");
         }
+        if (_usuarioRepository.findAll().stream().anyMatch(s -> s.getUsername().equals(newUser.getUsername()))) {
+            throw new WrongMethodTypeException("email already in use");
+        }
+
 
         newUser.setPassword(_passwordEncoder.encode(newUser.getPassword()));
 
@@ -49,7 +49,7 @@ public class RegistrationService implements UserDetailsService {
 
         ConfirmationToken confirmationToken = generateToken(result.getId());
 
-        sendEmail(confirmationToken.getToken(), result);
+//        sendEmail(confirmationToken.getToken(), result);
 
         return result;
     }
@@ -67,12 +67,12 @@ public class RegistrationService implements UserDetailsService {
 
     private void sendEmail(String token, Usuario result){
         String link = "http://localhost:8080/api/v1/auth/register/confirmation?token=" + token;
-        _emailSender.send(result.getEmail(), buildEmail(result.getUsername(), link) );
+        _emailSender.send(result.getUsername(), buildEmail(result.getNickname(), link) );
     }
 
     public Usuario login(Usuario user) throws Exception {
         Usuario result = _usuarioRepository.findAll().stream().filter(userN -> {
-            return userN.getEmail().equals(user.getEmail())
+            return userN.getUsername().equals(user.getUsername())
                     && _passwordEncoder.matches(user.getPassword(), userN.getPassword())
                     ;
         })
@@ -108,10 +108,11 @@ public class RegistrationService implements UserDetailsService {
 
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return _usuarioRepository.findAll().stream().filter(user -> user.getEmail().equals(email))
-                .findFirst().orElseThrow(() ->
-                        new UsernameNotFoundException("username: '" + email + "' not found"));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        return _usuarioRepository.findByUsername(username).orElseThrow(() ->
+            new UsernameNotFoundException("email: '" + username + "' not found"));
+
     }
 
 

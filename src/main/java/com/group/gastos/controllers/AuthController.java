@@ -1,10 +1,12 @@
 package com.group.gastos.controllers;
 
 import com.group.gastos.models.Usuario;
-import com.group.gastos.services.RegistrationService;
+import com.group.gastos.others.jwt.JwtToken;
+import com.group.gastos.services.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -14,14 +16,20 @@ import javax.websocket.server.PathParam;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final RegistrationService _registrationService;
+    private final CustomUserDetailsService _registrationService;
+    private AuthenticationManager authenticationManager;
+    private JwtToken jwtToken;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody Usuario user) throws ChangeSetPersister.NotFoundException {
+    public ResponseEntity<Object> login(@RequestBody Usuario user) {
         try {
-            return ResponseEntity.ok(_registrationService.login(user));
-        } catch (ChangeSetPersister.NotFoundException e) {
-            return ResponseEntity.notFound().build();
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getUsername(),
+                            user.getPassword()
+                    )
+            );
+            return ResponseEntity.ok(jwtToken.generateToken(user.getUsername()));
         } catch (Exception e) {
             System.out.println(e);
             return ResponseEntity.badRequest().body(e.getMessage());

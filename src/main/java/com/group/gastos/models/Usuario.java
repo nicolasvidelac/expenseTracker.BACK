@@ -25,15 +25,15 @@ public class Usuario implements UserDetails {
     @GeneratedValue
     private String id;
     private String username;
-    private String email;
+    private String nickname;
     private String password;
     private Float sueldo = 0F;
     private Boolean locked = false;
-    private Boolean enabled = false;
+    private Boolean enabled = true;
 
-    public Usuario(String username, String email, String password, Float sueldo, Boolean locked, Boolean enabled) {
+    public Usuario(String username, String nickname, String password, Float sueldo, Boolean locked, Boolean enabled) {
         this.username = username;
-        this.email = email;
+        this.nickname = nickname;
         this.password = password;
         this.sueldo = sueldo;
         this.locked = locked;
