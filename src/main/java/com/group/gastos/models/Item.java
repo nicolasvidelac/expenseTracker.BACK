@@ -17,11 +17,14 @@ public class Item {
     @GeneratedValue
     private String id;
 
-    private String description;
-    private LocalDate date;
-    private Float amount;
+    private String descripcion;
+    private LocalDate fecha;
+    private Float monto;
+    private Boolean isPesos;
+    private Integer cuotasTotal;
+    private Integer cuotasPendientes;
 
-    private Category category;
-    private int cantCuotas;
+    private Categoria categoria;
+    private Resumen resumen;
 
 }
