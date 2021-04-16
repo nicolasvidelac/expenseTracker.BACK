@@ -6,7 +6,6 @@ import com.group.gastos.models.Resumen;
 import com.group.gastos.repositories.CategoryRepository;
 import com.group.gastos.repositories.ResumenRepository;
 import com.group.gastos.repositories.UsuarioRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
-//@AllArgsConstructor
 public class ItemService {
 
     @Autowired
@@ -125,11 +123,16 @@ public class ItemService {
         throw new NoSuchElementException("item not found");
     }
 
-    private Resumen calculateGastoTotal(Resumen resumen){
+    private void calculateGastoTotal(Resumen resumen){
         AtomicReference<Float> totalGasto = new AtomicReference<>(0F);
-        resumen.getItems().forEach(s -> totalGasto.updateAndGet(v -> v + s.getMonto()));
+        resumen.getItems().forEach(s -> {
+            if(s.getIsPesos()){
+                totalGasto.updateAndGet(v -> v + s.getMonto());
+            } else {
+                totalGasto.updateAndGet(v -> v + s.getMonto() * resumen.getValorDolar());
+            }
+        });
         resumen.setTotalGasto(totalGasto.get());
-        return resumen;
     }
 
 }
