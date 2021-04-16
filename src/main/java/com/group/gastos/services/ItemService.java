@@ -3,6 +3,7 @@ package com.group.gastos.services;
 import com.group.gastos.models.EstadoResumen;
 import com.group.gastos.models.Item;
 import com.group.gastos.models.Resumen;
+import com.group.gastos.others.ResumenUtils;
 import com.group.gastos.repositories.CategoryRepository;
 import com.group.gastos.repositories.ResumenRepository;
 import com.group.gastos.repositories.UsuarioRepository;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +25,8 @@ public class ItemService {
     private ResumenRepository _resumenRepository;
     @Autowired
     private UsuarioRepository _usuarioRepository;
+    @Autowired
+    private ResumenUtils resumenUtils;
     @Autowired
     @Qualifier("getEstadoActivo")
     private EstadoResumen _estadoResumenActivo;
@@ -62,7 +64,7 @@ public class ItemService {
                 );
 
         resumen.getItems().add(newItem);
-        calculateGastoTotal(resumen);
+        resumenUtils.calculateGastoTotal(resumen);
         _resumenRepository.save(resumen);
 
         return newItem;
@@ -84,7 +86,7 @@ public class ItemService {
         resumen.getItems().stream().filter(s -> s.getId().equals(idItem)).findFirst()
                 .ifPresentOrElse(s -> s = finalItem, (Runnable) new IllegalStateException());
 
-        calculateGastoTotal(resumen);
+        resumenUtils.calculateGastoTotal(resumen);
         resumen = _resumenRepository.save(resumen);
 
         return resumen.getItems().stream().filter(s -> s.getId().equals(idItem)).findFirst().orElseThrow();
@@ -114,25 +116,11 @@ public class ItemService {
             result = resumen.getItems().removeIf(s -> s.getId().equals(idItem));
 
             if (result) {
-                calculateGastoTotal(resumen);
+                resumenUtils.calculateGastoTotal(resumen);
                 _resumenRepository.save(resumen);
                 return;
             }
         }
-
         throw new NoSuchElementException("item not found");
     }
-
-    private void calculateGastoTotal(Resumen resumen){
-        AtomicReference<Float> totalGasto = new AtomicReference<>(0F);
-        resumen.getItems().forEach(s -> {
-            if(s.getIsPesos()){
-                totalGasto.updateAndGet(v -> v + s.getMonto());
-            } else {
-                totalGasto.updateAndGet(v -> v + s.getMonto() * resumen.getValorDolar());
-            }
-        });
-        resumen.setTotalGasto(totalGasto.get());
-    }
-
 }

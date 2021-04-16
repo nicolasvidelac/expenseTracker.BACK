@@ -1,10 +1,8 @@
 package com.group.gastos.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.group.gastos.models.DolarAPI;
 import com.group.gastos.models.EstadoResumen;
 import com.group.gastos.models.Resumen;
+import com.group.gastos.others.ResumenUtils;
 import com.group.gastos.repositories.ResumenRepository;
 import com.group.gastos.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +10,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.HashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
-//@AllArgsConstructor
 public class ResumenService {
 
     @Autowired
@@ -30,6 +24,9 @@ public class ResumenService {
 
     @Autowired
     private ResumenRepository _resumenRepository;
+
+    @Autowired
+    private ResumenUtils resumenUtils;
 
     @Autowired
     @Qualifier("getEstadoActivo")
@@ -48,7 +45,8 @@ public class ResumenService {
 
         for(Resumen resumen: resumenList){
             resumen.setEstado(estadoInactivo);
-            resumen.setValorDolar(getPrecioDolar());
+            resumen.setValorDolar(resumenUtils.getPrecioDolar());
+            resumenUtils.calculateGastoTotal(resumen);
             _resumenRepository.save(resumen);
         }
     }
@@ -69,7 +67,6 @@ public class ResumenService {
 
     }
 
-
     public Resumen findActiveResumen(String username) {
         String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
         return _resumenRepository.findAll().stream().filter(s -> s.getEstado().equals(estadoActivo) &&
@@ -82,8 +79,7 @@ public class ResumenService {
     }
 
     public Resumen createResumen(String username, Float sueldo) throws InterruptedException, IOException {
-        //todo buscar api para valor del dolar a pesos
-        Float valorDolar = getPrecioDolar();
+        Float valorDolar = resumenUtils.getPrecioDolar();
         String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
 
         Resumen resumen = (new Resumen(sueldo, valorDolar, idUsuario, estadoActivo));
@@ -104,24 +100,4 @@ public class ResumenService {
                         () -> new NoSuchElementException("resumen no encontrado")
                 );
     }
-
-
-
-    private Float getPrecioDolar() throws IOException, InterruptedException {
-        Float result;
-        URI url = URI.create("https://api-dolar-argentina.herokuapp.com/api/galicia");
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(url)
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        DolarAPI dolarAPI = objectMapper.readValue(response.body(), new TypeReference<DolarAPI>() { });
-        result = dolarAPI.getVenta();
-        result = result + result * 0.3F + result * 0.35F;
-        return  result;
-    }
-
 }
