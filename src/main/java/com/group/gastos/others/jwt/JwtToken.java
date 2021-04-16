@@ -1,5 +1,6 @@
 package com.group.gastos.others.jwt;
 
+import com.group.gastos.others.enums.KeysEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,14 +16,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtToken {
-    //todo guardar contraseña en algun lado seguro
-    private String secret =
-            "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita" +
-            "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita" +
-            "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita" +
-            "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita" +
-            "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita" +
-            "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita";
+    private final String secret = KeysEnum.encoding_key.toString();
 
     public String getUsername(String token){
         return getClaim(token, Claims::getSubject);

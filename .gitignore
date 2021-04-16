@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secret ###
+**/src/main/java/com/group/gastos/other/enum/KeysEnum.java
