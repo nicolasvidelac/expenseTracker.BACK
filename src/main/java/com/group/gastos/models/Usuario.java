@@ -24,21 +24,12 @@ public class Usuario implements UserDetails {
     @Id
     @GeneratedValue
     private String id;
-    private String username;
-    private String nickname;
-    private String password;
+    private String username = null;
+    private String nickname = null;
+    private String password = null;
     private Float sueldo = 0F;
     private Boolean locked = false;
     private Boolean enabled = true;
-
-    public Usuario(String username, String nickname, String password, Float sueldo, Boolean locked, Boolean enabled) {
-        this.username = username;
-        this.nickname = nickname;
-        this.password = password;
-        this.sueldo = sueldo;
-        this.locked = locked;
-        this.enabled = enabled;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

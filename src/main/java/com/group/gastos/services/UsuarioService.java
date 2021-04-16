@@ -16,38 +16,49 @@ public class UsuarioService {
     private final PasswordEncoder _passwordEncoder;
     private final EmailValidator _emailValidator;
 
-    public Usuario updateUser(Usuario updateUser) {
-        try {
-            if (updateUser.getUsername().isBlank() || updateUser.getNickname().isBlank() ||
-                    updateUser.getPassword().isBlank()) {
-                throw new NullPointerException("field cannot be empty");
-            }
-        } catch (Exception e) {
-            throw new NullPointerException("field cannot be empty");
-        }
-        if (!_emailValidator.test(updateUser.getUsername())) {
-            throw new IllegalArgumentException("email invalid");
-        }
-        Usuario oldUser = _usuarioRepository.findById(updateUser.getId()).orElseThrow();
-        updateUser.setPassword(_passwordEncoder.encode(updateUser.getPassword()));
+    public Usuario updateUser(String username, Usuario updateUser) {
 
-        return _usuarioRepository.insert(updateUser);
+        //busco el usuario, para ver si existe, si existe, me traigo el id
+        Usuario oldUser =  _usuarioRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("username not found"));
+
+        //cambio el email, si es que trajo
+        if (updateUser.getUsername() != null){
+            if (_emailValidator.test(updateUser.getUsername())) {
+                oldUser.setUsername(updateUser.getUsername());
+            } else {
+                throw new IllegalArgumentException("email invalid");
+            }
+        }
+
+        if(updateUser.getNickname() != null){
+            oldUser.setNickname(updateUser.getNickname());
+        }
+
+        if(updateUser.getPassword() != null){
+            oldUser.setPassword(_passwordEncoder.encode(updateUser.getPassword()));
+        }
+
+        if(updateUser.getSueldo() != null){
+            oldUser.setSueldo(updateUser.getSueldo());
+        }
+
+        return _usuarioRepository.save(oldUser);
 
     }
 
-    public Usuario findUsuario(String email) {
-        Usuario result = _usuarioRepository.findAll().stream().filter(user -> user.getUsername().equals(email))
-                .findFirst().orElseThrow(() -> new UsernameNotFoundException("email not found"));
+    public Usuario findUsuario(String username) {
+        Usuario result = _usuarioRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("user not found"));
         return result;
     }
 
 
-    public void deleteUsuario(String id) {
-        Usuario user = _usuarioRepository.findAll().stream().filter(s -> s.getId().equals(id))
+    public void deleteUsuario(String username) {
+        Usuario user = _usuarioRepository.findAll().stream().filter(s -> s.getUsername().equals(username))
                 .findFirst().orElseThrow(() -> new UsernameNotFoundException("user not found"));
 
-        _usuarioRepository.delete(user);
+        user.setEnabled(false);
+        _usuarioRepository.save(user);
     }
-
-
 }

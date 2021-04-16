@@ -1,108 +1,135 @@
 package com.group.gastos.services;
 
-import com.group.gastos.models.Categoria;
 import com.group.gastos.models.EstadoResumen;
 import com.group.gastos.models.Item;
 import com.group.gastos.models.Resumen;
 import com.group.gastos.repositories.CategoryRepository;
-import com.group.gastos.repositories.ItemRepository;
 import com.group.gastos.repositories.ResumenRepository;
+import com.group.gastos.repositories.UsuarioRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+//@AllArgsConstructor
 public class ItemService {
 
-    private final ItemRepository _itemRepository;
-    private final CategoryRepository _categoryRepository;
-    private final ResumenRepository _resumenRepository;
-
+    @Autowired
+    private CategoryRepository _categoryRepository;
+    @Autowired
+    private ResumenRepository _resumenRepository;
+    @Autowired
+    private UsuarioRepository _usuarioRepository;
+    @Autowired
     @Qualifier("getEstadoActivo")
-    private final EstadoResumen _estadoResumenActivo;
+    private EstadoResumen _estadoResumenActivo;
 
-    public List<Item> getAllItems(String username) {
-        return _itemRepository.findAll().stream().filter(item ->
-                    item.getResumen().getUsuario().getUsername().equals(username) &&
-                    item.getResumen().getEstado().equals(_estadoResumenActivo) &&
-                    item.getFecha().isAfter(LocalDate.now().minusMonths(1)))
-                .collect(Collectors.toList());
-    }
+    public Item saveItem(String username, Item newItem) {
 
-    public Item saveItem(Item newItem, String username) {
+        try {
+            if (newItem.getFecha() == null) {
+                newItem.setFecha(LocalDate.now());
+            }
+        } catch (NullPointerException e) {
+            newItem.setFecha(LocalDate.now());
+        }
 
-        newItem.setFecha(LocalDate.now());
+        String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
 
         //si no es en cuotas, en realidad esta siendo en una cuota
-        try{
+        try {
             newItem.setCuotasPendientes(newItem.getCuotasTotal() - 1);
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             newItem.setCuotasTotal(1);
             newItem.setCuotasPendientes(newItem.getCuotasTotal() - 1);
         }
 
-        newItem.setCategoria(handleCategoria(newItem.getCategoria().getDescripcion()));
-
         Resumen resumen = _resumenRepository.findAll().stream().filter(
-                s -> s.getUsuario().getUsername().equals(username) &&
-                        s.getEstado().equals(_estadoResumenActivo)
-        ).findFirst().orElseThrow(
-                () -> new NoSuchElementException("resumen not found")
-        );
+                s ->
+                        s.getUsuario_id().equals(idUsuario) &&
+                                s.getFechaInicio().isBefore(newItem.getFecha()) &&
+                                s.getFechaFin().isAfter(newItem.getFecha())
 
-        newItem.setResumen(resumen);
+        ).findFirst()
 
+                .orElseThrow(
+                        () -> new NoSuchElementException("resumen not found")
+                );
 
-        return _itemRepository.save(newItem);
+        resumen.getItems().add(newItem);
+        calculateGastoTotal(resumen);
+        _resumenRepository.save(resumen);
+
+        return newItem;
     }
 
-    private Categoria handleCategoria(String descripcion){
 
-            Categoria result = null;
+    public Item updateItem(String username, String idItem, Item item) {
 
-            try {
-                //busco la categoria con esa descripcion
-                result = _categoryRepository.findByDescripcion(descripcion.toLowerCase(Locale.ROOT)).orElseThrow();
+        Item finalItem = item;
 
-            } catch (NoSuchElementException e) {
-                //guardo la categoria que todavia no existe
-                result = _categoryRepository.save(new Categoria(descripcion.toLowerCase(Locale.ROOT)));
+        String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
+
+        Resumen resumen = _resumenRepository.findAll().stream().filter(s ->
+                s.getUsuario_id().equals(idUsuario) &&
+                        s.getFechaInicio().isBefore(item.getFecha()) &&
+                        s.getFechaFin().isAfter(item.getFecha())
+        ).findFirst().orElseThrow();
+
+        resumen.getItems().stream().filter(s -> s.getId().equals(idItem)).findFirst()
+                .ifPresentOrElse(s -> s = finalItem, (Runnable) new IllegalStateException());
+
+        calculateGastoTotal(resumen);
+        resumen = _resumenRepository.save(resumen);
+
+        return resumen.getItems().stream().filter(s -> s.getId().equals(idItem)).findFirst().orElseThrow();
+    }
+
+    public Item getItem(String username, String id) {
+        String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
+
+        List<Resumen> resumenes = _resumenRepository.findAll().stream().filter(s -> s.getUsuario_id().equals(idUsuario)).collect(Collectors.toList());
+
+        for (Resumen resumen : resumenes
+        ) {
+            return resumen.getItems().stream().filter(s -> s.getId().equals(id)).findFirst().orElseThrow();
+        }
+        return null;
+    }
+
+    public void deleteItem(String username, String idItem) {
+
+        String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
+
+        List<Resumen> resumenes = _resumenRepository.findAll().stream().filter(s -> s.getUsuario_id().equals(idUsuario)).collect(Collectors.toList());
+
+        for (Resumen resumen : resumenes
+        ) {
+            boolean result;
+            result = resumen.getItems().removeIf(s -> s.getId().equals(idItem));
+
+            if (result) {
+                calculateGastoTotal(resumen);
+                _resumenRepository.save(resumen);
+                return;
             }
+        }
 
-            return result;
-
+        throw new NoSuchElementException("item not found");
     }
 
-    public Item updateItem (Item item) {
-
-        Item entity = _itemRepository.findById(item.getId()).orElseThrow(() ->
-                new NoSuchElementException("item not found")
-        );
-
-        item.setCategoria(handleCategoria(item.getCategoria().getDescripcion()));
-        item.setId(entity.getId());
-        item = _itemRepository.save(item);
-        return item;
+    private Resumen calculateGastoTotal(Resumen resumen){
+        AtomicReference<Float> totalGasto = new AtomicReference<>(0F);
+        resumen.getItems().forEach(s -> totalGasto.updateAndGet(v -> v + s.getMonto()));
+        resumen.setTotalGasto(totalGasto.get());
+        return resumen;
     }
 
-    public Item getItem(String id){
-        return _itemRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("item doesn't exist")
-        );
-    }
-
-    public void deleteItem(String id) {
-
-        _itemRepository.delete(_itemRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("item doesn't exist")
-        ));
-
-    }
 }

@@ -5,9 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UsuarioDTO {
+public class AuthDTO {
     private String username;
+    private String password;
     private String nickname;
-    private Float sueldo;
-    private String token;
 }

@@ -1,12 +1,9 @@
 package com.group.gastos.services;
 
-import com.group.gastos.models.EstadoResumen;
-import com.group.gastos.models.Resumen;
 import com.group.gastos.models.Usuario;
 import com.group.gastos.others.email.EmailSender;
 import com.group.gastos.others.registration.ConfirmationToken;
 import com.group.gastos.others.registration.EmailValidator;
-import com.group.gastos.repositories.ResumenRepository;
 import com.group.gastos.repositories.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.lang.invoke.WrongMethodTypeException;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -29,11 +27,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final PasswordEncoder _passwordEncoder;
     private final ConfirmationTokenService _confirmationTokenService;
     private final EmailSender _emailSender;
+    private final ResumenService _ResumenService;
 
-    private EstadoResumen _estadoResumenActivo;
-    private final ResumenRepository _resumenRepository;
-
-    public Usuario register(Usuario newUser) {
+    public Usuario register(Usuario newUser) throws IOException, InterruptedException {
 
         try {
             if (newUser.getUsername().isBlank() || newUser.getNickname().isBlank() || newUser.getPassword().isBlank()) {
@@ -54,12 +50,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Usuario result = _usuarioRepository.save(newUser);
 
-        ConfirmationToken confirmationToken = generateToken(result.getId());
-
+        //todo enviar email con token de confirmacion
+//        ConfirmationToken confirmationToken = generateToken(result.getId());
 //        sendEmail(confirmationToken.getToken(), result);
 
-        _resumenRepository.save(new Resumen(result.getSueldo(), 150F, result, _estadoResumenActivo));
-
+        _ResumenService.createResumen(result.getUsername());
         return result;
     }
 

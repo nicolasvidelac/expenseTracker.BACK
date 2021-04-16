@@ -17,9 +17,9 @@ public class myBeans {
         return new EstadoResumen("1", "activo");
     }
 
-//    @Bean
-//    public EstadoResumen getEstadoInactivo(){
-//        return new EstadoResumen("2", "inactivo");
-//    }
+    @Bean
+    public EstadoResumen getEstadoInactivo(){
+        return new EstadoResumen("2", "inactivo");
+    }
 
 }

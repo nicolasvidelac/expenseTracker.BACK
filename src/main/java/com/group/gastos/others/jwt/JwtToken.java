@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtToken {
+    //todo guardar contraseña en algun lado seguro
     private String secret =
             "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita" +
             "gorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonitagorditamasbonita" +

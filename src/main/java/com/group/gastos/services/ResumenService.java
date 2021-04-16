@@ -1,0 +1,127 @@
+package com.group.gastos.services;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group.gastos.models.DolarAPI;
+import com.group.gastos.models.EstadoResumen;
+import com.group.gastos.models.Resumen;
+import com.group.gastos.repositories.ResumenRepository;
+import com.group.gastos.repositories.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+@Service
+//@AllArgsConstructor
+public class ResumenService {
+
+    @Autowired
+    private UsuarioRepository _usuarioRepository;
+
+    @Autowired
+    private ResumenRepository _resumenRepository;
+
+    @Autowired
+    @Qualifier("getEstadoActivo")
+    private EstadoResumen estadoActivo;
+
+    @Autowired
+    @Qualifier("getEstadoInactivo")
+    private EstadoResumen estadoInactivo;
+
+
+    public void setResumenInactive() throws IOException, InterruptedException {
+        //todo por ahi deberia traer solo el primero
+        List<Resumen> resumenList = _resumenRepository.findAll().stream().filter(s ->
+                s.getEstado().equals(estadoActivo))
+                .collect(Collectors.toList());
+
+        for(Resumen resumen: resumenList){
+            resumen.setEstado(estadoInactivo);
+            resumen.setValorDolar(getPrecioDolar());
+            _resumenRepository.save(resumen);
+        }
+    }
+
+    public void createNewResumenes()throws IOException {
+        HashMap<String, Float> usuarios = new HashMap<>();
+        _usuarioRepository.findAll().forEach( s ->
+                usuarios.put(s.getUsername(), s.getSueldo())
+                );
+
+        usuarios.forEach((k,v) -> {
+            try {
+                createResumen(k,v);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+
+    public Resumen findActiveResumen(String username) {
+        String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
+        return _resumenRepository.findAll().stream().filter(s -> s.getEstado().equals(estadoActivo) &&
+                s.getUsuario_id().equals(idUsuario))
+                .findFirst().orElseThrow(() -> new NoSuchElementException("resumen no encontrado"));
+    }
+
+    public Resumen createResumen(String username) throws IOException, InterruptedException {
+        return createResumen(username, 0F);
+    }
+
+    public Resumen createResumen(String username, Float sueldo) throws InterruptedException, IOException {
+        //todo buscar api para valor del dolar a pesos
+        Float valorDolar = getPrecioDolar();
+        String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
+
+        Resumen resumen = (new Resumen(sueldo, valorDolar, idUsuario, estadoActivo));
+        return saveResumen(resumen);
+    }
+
+    private Resumen saveResumen(Resumen resumen) {
+        return _resumenRepository.save(resumen);
+    }
+
+    public Resumen findResumenByFechaInicio(LocalDate localDate, String username) {
+        String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
+        return _resumenRepository.findAll().stream().filter(s ->
+                s.getUsuario_id().equals(idUsuario) &&
+                        s.getFechaInicio().getMonth().equals(localDate.getMonth()) &&
+                        s.getFechaInicio().getYear() == localDate.getYear())
+                .findFirst().orElseThrow(
+                        () -> new NoSuchElementException("resumen no encontrado")
+                );
+    }
+
+
+
+    private Float getPrecioDolar() throws IOException, InterruptedException {
+        Float result;
+        URI url = URI.create("https://api-dolar-argentina.herokuapp.com/api/galicia");
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(url)
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        DolarAPI dolarAPI = objectMapper.readValue(response.body(), new TypeReference<DolarAPI>() { });
+        result = dolarAPI.getVenta();
+        result = result + result * 0.3F + result * 0.35F;
+        return  result;
+    }
+
+}

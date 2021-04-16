@@ -17,6 +17,23 @@ public class Categoria {
     private String descripcion;
 
     public Categoria(String descripcion) {
-        this.descripcion = descripcion;
+        this.descripcion = upperCaseFirst(descripcion);
+    }
+
+    private static String upperCaseFirst(String value) {
+
+        // Convert String to char array.
+        char[] array = value.toCharArray();
+
+        // Modify first element in array.
+        array[0] = Character.toUpperCase(array[0]);
+
+        //every other element to lower case
+        for(int i = 1; i<array.length ; i++){
+            array[i] = Character.toLowerCase(array[i]);
+        }
+
+        // Return string.
+        return new String(array);
     }
 }
