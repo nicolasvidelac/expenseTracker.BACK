@@ -2,7 +2,7 @@ package com.group.gastos.services;
 
 import com.group.gastos.models.EstadoResumen;
 import com.group.gastos.models.Resumen;
-import com.group.gastos.others.ResumenUtils;
+import com.group.gastos.others.others.ResumenUtils;
 import com.group.gastos.repositories.ResumenRepository;
 import com.group.gastos.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;

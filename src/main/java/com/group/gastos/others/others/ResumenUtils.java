@@ -1,4 +1,4 @@
-package com.group.gastos.others;
+package com.group.gastos.others.others;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
