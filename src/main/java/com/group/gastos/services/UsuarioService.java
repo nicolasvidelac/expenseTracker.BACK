@@ -1,7 +1,7 @@
 package com.group.gastos.services;
 
 import com.group.gastos.models.Usuario;
-import com.group.gastos.others.registration.EmailValidator;
+import com.group.gastos.others.email.EmailValidator;
 import com.group.gastos.repositories.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

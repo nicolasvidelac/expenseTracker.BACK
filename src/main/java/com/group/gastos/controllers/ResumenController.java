@@ -3,6 +3,7 @@ package com.group.gastos.controllers;
 import com.group.gastos.others.jwt.JwtToken;
 import com.group.gastos.servicesDTO.ResumenServiceDTO;
 import lombok.AllArgsConstructor;
+import org.modelmapper.spi.ErrorMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/resumen")
+@CrossOrigin
 public class ResumenController {
 
     private final ResumenServiceDTO _resumenServiceDTO;
@@ -24,7 +26,7 @@ public class ResumenController {
             String username = getUsername(token);
             return ResponseEntity.ok(_resumenServiceDTO.findActiveResumen(username));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
         }
     }
 
@@ -38,7 +40,7 @@ public class ResumenController {
             LocalDate fecha = LocalDate.now().withYear(year).withMonth(month);
             return ResponseEntity.ok(_resumenServiceDTO.findByFechaInicio(username, fecha));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
         }
     }
 

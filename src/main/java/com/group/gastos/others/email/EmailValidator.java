@@ -1,4 +1,4 @@
-package com.group.gastos.others.registration;
+package com.group.gastos.others.email;
 
 import org.springframework.stereotype.Service;
 

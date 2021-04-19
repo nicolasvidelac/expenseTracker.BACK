@@ -4,12 +4,14 @@ import com.group.gastos.models.dtos.UsuarioDTO;
 import com.group.gastos.others.jwt.JwtToken;
 import com.group.gastos.servicesDTO.UsuarioServiceDTO;
 import lombok.AllArgsConstructor;
+import org.modelmapper.spi.ErrorMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/usuario")
 @AllArgsConstructor
+@CrossOrigin
 public class UsuarioController {
 
     private final UsuarioServiceDTO _usuarioServiceDTO;
@@ -22,7 +24,7 @@ public class UsuarioController {
             String username = getUsername(token);
             return ResponseEntity.ok(_usuarioServiceDTO.updateUser(username, usuarioDTO));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
         }
     }
 
@@ -32,7 +34,7 @@ public class UsuarioController {
             String username = getUsername(token);
             return ResponseEntity.ok(_usuarioServiceDTO.getUsuario(username));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
         }
     }
 
@@ -43,7 +45,7 @@ public class UsuarioController {
             _usuarioServiceDTO.deleteUsuario(username);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
         }
     }
 
