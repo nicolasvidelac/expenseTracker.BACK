@@ -1,6 +1,5 @@
 package com.group.gastos.controllers;
 
-import com.google.gson.Gson;
 import com.group.gastos.models.dtos.AuthDTO;
 import com.group.gastos.servicesDTO.UsuarioServiceDTO;
 import lombok.AllArgsConstructor;
