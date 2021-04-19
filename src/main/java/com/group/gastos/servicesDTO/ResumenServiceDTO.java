@@ -20,8 +20,8 @@ public class ResumenServiceDTO {
 
 
 
-    public ResumenDTO findActiveResumen(String idUsuario) {
-        ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findActiveResumen(idUsuario), ResumenDTO.class);
+    public ResumenDTO findActiveResumen(String username) {
+        ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findActiveResumen(username), ResumenDTO.class);
         resumenDTO.setNombreMes((resumenDTO.getNombreMes()));
 
         for (ItemDTO itemDTO: resumenDTO.getItems()
@@ -32,10 +32,14 @@ public class ResumenServiceDTO {
         return resumenDTO;
     }
 
-    public ResumenDTO findByFechaInicio(String idUsuario, LocalDate localDate) {
-        ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findResumenByFechaInicio(localDate, idUsuario)
+    public ResumenDTO findByFechaInicio(String username, LocalDate localDate) {
+        ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findResumenByFechaInicio(localDate, username)
                 , ResumenDTO.class);
         resumenDTO.setNombreMes(resumenDTO.getNombreMes());
         return resumenDTO;
+    }
+
+    public ResumenDTO updateResuen(String username, LocalDate localDate, Float nuevoMonto){
+        return _modelMapper.map(_resumenService.updateResumen(username, localDate, nuevoMonto), ResumenDTO.class);
     }
 }

@@ -1,5 +1,6 @@
 package com.group.gastos.controllers;
 
+import com.group.gastos.models.dtos.ResumenDTO;
 import com.group.gastos.others.jwt.JwtToken;
 import com.group.gastos.servicesDTO.ResumenServiceDTO;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,21 @@ public class ResumenController {
             String username = getUsername(token);
             LocalDate fecha = LocalDate.now().withYear(year).withMonth(month);
             return ResponseEntity.ok(_resumenServiceDTO.findByFechaInicio(username, fecha));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
+        }
+    }
+
+    @PatchMapping("/{year}/{month}")
+    public ResponseEntity<Object> updateSueldo(@RequestHeader(name = "Authorization") String token,
+                                                @PathVariable("year") Integer year,
+                                                @PathVariable("month") Integer month,
+                                                @RequestBody ResumenDTO resumenDTO
+                                                ) {
+        try {
+            String username = getUsername(token);
+            LocalDate fecha = LocalDate.now().withYear(year).withMonth(month);
+            return ResponseEntity.ok(_resumenServiceDTO.updateResuen(username, fecha, resumenDTO.getSueldoActual()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
         }
