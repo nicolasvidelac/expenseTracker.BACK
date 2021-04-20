@@ -1,5 +1,6 @@
 package com.group.gastos.models;
 
+import com.group.gastos.others.enums.MesesEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,26 +38,9 @@ public class Resumen {
         this.valorDolar = valorDolar;
         this.fechaInicio = LocalDate.now().withDayOfMonth(1);
         this.fechaFin = LocalDate.now().withDayOfMonth(1).plusDays(LocalDate.now().lengthOfMonth() - 1);
-        this.nombreMes = upperCaseFirst(LocalDate.now().getMonth().name());
+        this.nombreMes = MesesEnum.valueOf(LocalDate.now().getMonth().name()).getLabel();
         this.usuario_id = usuario_id;
         this.estado = estado;
         this.items = new ArrayList<>();
-    }
-
-    private static String upperCaseFirst(String value) {
-
-        // Convert String to char array.
-        char[] array = value.toCharArray();
-
-        // Modify first element in array.
-        array[0] = Character.toUpperCase(array[0]);
-
-        //every other element to lower case
-        for(int i = 1; i<array.length ; i++){
-            array[i] = Character.toLowerCase(array[i]);
-        }
-
-        // Return string.
-        return new String(array);
     }
 }
