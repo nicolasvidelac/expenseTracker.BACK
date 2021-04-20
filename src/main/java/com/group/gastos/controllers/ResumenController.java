@@ -20,7 +20,7 @@ public class ResumenController {
     private final ResumenServiceDTO _resumenServiceDTO;
     private final JwtToken jwtToken;
 
-    @GetMapping
+    @GetMapping("/active")
     public ResponseEntity<Object> findActiveResumen(@RequestHeader(name = "Authorization") String token) {
 
         try {
