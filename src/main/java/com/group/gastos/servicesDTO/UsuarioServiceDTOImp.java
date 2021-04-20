@@ -4,8 +4,9 @@ import com.group.gastos.models.Usuario;
 import com.group.gastos.models.dtos.AuthDTO;
 import com.group.gastos.models.dtos.UsuarioDTO;
 import com.group.gastos.others.jwt.JwtToken;
-import com.group.gastos.services.CustomUserDetailsService;
-import com.group.gastos.services.UsuarioService;
+import com.group.gastos.services.Intefaces.CustomUserDetailsService;
+import com.group.gastos.services.Intefaces.UsuarioService;
+import com.group.gastos.servicesDTO.Interfaces.UsuarioServiceDTO;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +17,7 @@ import java.io.IOException;
 
 @Service
 @AllArgsConstructor
-public class UsuarioServiceDTO {
+public class UsuarioServiceDTOImp implements UsuarioServiceDTO {
 
     private final UsuarioService _usuarioService;
     private final ModelMapper _modelMapper;
@@ -62,6 +63,4 @@ public class UsuarioServiceDTO {
     public boolean confirmToken(String token) {
         return _registrationService.confirmToken(token);
     }
-
-
 }

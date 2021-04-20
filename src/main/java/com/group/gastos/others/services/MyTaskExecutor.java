@@ -1,7 +1,7 @@
 package com.group.gastos.others.services;
 
-import com.group.gastos.services.ResumenService;
-import lombok.SneakyThrows;
+
+import com.group.gastos.services.Intefaces.ResumenService;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

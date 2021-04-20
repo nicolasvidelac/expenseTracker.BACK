@@ -2,15 +2,16 @@ package com.group.gastos.servicesDTO;
 
 import com.group.gastos.models.Item;
 import com.group.gastos.models.dtos.ItemDTO;
-import com.group.gastos.services.CategoriaService;
-import com.group.gastos.services.ItemService;
+import com.group.gastos.services.Intefaces.CategoriaService;
+import com.group.gastos.services.Intefaces.ItemService;
+import com.group.gastos.servicesDTO.Interfaces.ItemServiceDTO;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ItemServiceDTO {
+public class ItemServiceDTOImp implements ItemServiceDTO {
     private final ItemService _itemService;
     private final ModelMapper _modelMapper;
     private final CategoriaService _categoriaService;

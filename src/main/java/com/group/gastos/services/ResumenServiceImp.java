@@ -5,6 +5,7 @@ import com.group.gastos.models.Resumen;
 import com.group.gastos.others.others.ResumenUtils;
 import com.group.gastos.repositories.ResumenRepository;
 import com.group.gastos.repositories.UsuarioRepository;
+import com.group.gastos.services.Intefaces.ResumenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
-public class ResumenService {
+public class ResumenServiceImp implements ResumenService {
 
     @Autowired
     private UsuarioRepository _usuarioRepository;
@@ -46,18 +47,11 @@ public class ResumenService {
         return _resumenRepository.save(resumen);
     }
 
-    public List<Resumen> findAllResumenes(String username) throws IOException, InterruptedException {
+    public List<Resumen> findAllResumenes(String username) {
         String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
         List<Resumen> resumenes = _resumenRepository.findAll().stream().filter(s ->
-                    s.getEstado().equals(estadoActivo) &&
                     s.getUsuario_id().equals(idUsuario))
                 .collect(Collectors.toList());
-
-        Float valorDolar = resumenUtils.getPrecioDolar();
-        for(Resumen resumen: resumenes){
-            resumen.setValorDolar(valorDolar);
-            _resumenRepository.save(resumen);
-        }
 
         return resumenes;
     }
@@ -74,17 +68,17 @@ public class ResumenService {
         return saveResumen(resumen);
     }
 
-    public Resumen findResumenByFechaInicio(LocalDate localDate, String username) throws IOException, InterruptedException {
+    public Resumen findResumenByFechaInicio(LocalDate localDate, String username) {
         String idUsuario = (_usuarioRepository.findByUsername(username).stream().findFirst().orElseThrow()).getId();
         Resumen resumen = _resumenRepository.findAll().stream().filter(s ->
-                s.getUsuario_id().equals(idUsuario) &&
+                        s.getUsuario_id().equals(idUsuario) &&
                         s.getFechaInicio().getMonth().equals(localDate.getMonth()) &&
                         s.getFechaInicio().getYear() == localDate.getYear())
                 .findFirst().orElseThrow(
                         () -> new NoSuchElementException("resumen no encontrado")
                 );
-        resumen.setValorDolar(resumenUtils.getPrecioDolar());
-        return _resumenRepository.save(resumen);
+
+        return resumen;
     }
 
     public Resumen updateResumen(String username, LocalDate localDate, Float nuevoMonto){

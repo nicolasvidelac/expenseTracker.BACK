@@ -1,13 +1,14 @@
 package com.group.gastos.services;
 
 import com.group.gastos.models.Usuario;
-import com.group.gastos.others.email.EmailSender;
 import com.group.gastos.others.registration.ConfirmationToken;
 import com.group.gastos.others.email.EmailValidator;
 import com.group.gastos.repositories.UsuarioRepository;
+import com.group.gastos.services.Intefaces.ConfirmationTokenService;
+import com.group.gastos.services.Intefaces.CustomUserDetailsService;
+import com.group.gastos.services.Intefaces.ResumenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsServiceImp implements CustomUserDetailsService {
 
     private final UsuarioRepository _usuarioRepository;
 

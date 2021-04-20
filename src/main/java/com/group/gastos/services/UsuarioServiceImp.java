@@ -3,6 +3,7 @@ package com.group.gastos.services;
 import com.group.gastos.models.Usuario;
 import com.group.gastos.others.email.EmailValidator;
 import com.group.gastos.repositories.UsuarioRepository;
+import com.group.gastos.services.Intefaces.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class UsuarioService {
+public class UsuarioServiceImp implements UsuarioService {
 
     private final UsuarioRepository _usuarioRepository;
     private final PasswordEncoder _passwordEncoder;
@@ -52,7 +53,6 @@ public class UsuarioService {
                 () -> new UsernameNotFoundException("user not found"));
         return result;
     }
-
 
     public void deleteUsuario(String username) {
         Usuario user = _usuarioRepository.findAll().stream().filter(s -> s.getUsername().equals(username))

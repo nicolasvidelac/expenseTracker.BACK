@@ -1,7 +1,7 @@
 package com.group.gastos.others.security.configs;
 
 import com.group.gastos.others.jwt.JwtFilter;
-import com.group.gastos.services.CustomUserDetailsService;
+import com.group.gastos.services.Intefaces.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

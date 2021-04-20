@@ -7,6 +7,7 @@ import com.group.gastos.others.others.ResumenUtils;
 import com.group.gastos.repositories.CategoryRepository;
 import com.group.gastos.repositories.ResumenRepository;
 import com.group.gastos.repositories.UsuarioRepository;
+import com.group.gastos.services.Intefaces.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
-public class ItemService {
+public class ItemServiceImp implements ItemService {
 
     @Autowired
     private CategoryRepository _categoryRepository;
@@ -69,7 +70,6 @@ public class ItemService {
 
         return newItem;
     }
-
 
     public Item updateItem(String username, String idItem, Item item) {
 

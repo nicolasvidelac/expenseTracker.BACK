@@ -3,8 +3,9 @@ package com.group.gastos.servicesDTO;
 import com.group.gastos.models.Resumen;
 import com.group.gastos.models.dtos.ItemDTO;
 import com.group.gastos.models.dtos.ResumenDTO;
-import com.group.gastos.services.CategoriaService;
-import com.group.gastos.services.ResumenService;
+import com.group.gastos.services.Intefaces.CategoriaService;
+import com.group.gastos.services.Intefaces.ResumenService;
+import com.group.gastos.servicesDTO.Interfaces.ResumenServiceDTO;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,11 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ResumenServiceDTO {
+public class ResumenServiceDTOImp implements ResumenServiceDTO {
 
     private final ResumenService _resumenService;
     private final ModelMapper _modelMapper;
     private final CategoriaService _CategoriaService;
-
-
 
     public ResumenDTO findActiveResumen(String username) throws IOException, InterruptedException {
         ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findActiveResumen(username), ResumenDTO.class);
@@ -47,8 +46,6 @@ public class ResumenServiceDTO {
 
         return resumenesDTO;
     }
-
-
 
     public ResumenDTO findByFechaInicio(String username, LocalDate localDate) throws IOException, InterruptedException {
         ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findResumenByFechaInicio(localDate, username)

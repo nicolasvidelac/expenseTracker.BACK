@@ -1,7 +1,7 @@
 package com.group.gastos.controllers;
 
 import com.group.gastos.models.dtos.AuthDTO;
-import com.group.gastos.servicesDTO.UsuarioServiceDTO;
+import com.group.gastos.servicesDTO.Interfaces.UsuarioServiceDTO;
 import lombok.AllArgsConstructor;
 import org.modelmapper.spi.ErrorMessage;
 import org.springframework.http.ResponseEntity;

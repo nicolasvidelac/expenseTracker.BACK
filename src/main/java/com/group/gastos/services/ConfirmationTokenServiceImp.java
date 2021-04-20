@@ -2,6 +2,7 @@ package com.group.gastos.services;
 
 import com.group.gastos.others.registration.ConfirmationToken;
 import com.group.gastos.repositories.ConfirmationTokenRepository;
+import com.group.gastos.services.Intefaces.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
-public class ConfirmationTokenService {
+public class ConfirmationTokenServiceImp implements ConfirmationTokenService {
 
     private final ConfirmationTokenRepository _confirmationTokenRepository;
 

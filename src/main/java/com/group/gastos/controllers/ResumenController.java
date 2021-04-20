@@ -2,7 +2,7 @@ package com.group.gastos.controllers;
 
 import com.group.gastos.models.dtos.ResumenDTO;
 import com.group.gastos.others.jwt.JwtToken;
-import com.group.gastos.servicesDTO.ResumenServiceDTO;
+import com.group.gastos.servicesDTO.Interfaces.ResumenServiceDTO;
 import lombok.AllArgsConstructor;
 import org.modelmapper.spi.ErrorMessage;
 import org.springframework.http.ResponseEntity;
