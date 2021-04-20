@@ -1,5 +1,6 @@
 package com.group.gastos.servicesDTO;
 
+import com.group.gastos.models.Resumen;
 import com.group.gastos.models.dtos.ItemDTO;
 import com.group.gastos.models.dtos.ResumenDTO;
 import com.group.gastos.services.CategoriaService;
@@ -8,7 +9,10 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +24,7 @@ public class ResumenServiceDTO {
 
 
 
-    public ResumenDTO findActiveResumen(String username) {
+    public ResumenDTO findActiveResumen(String username) throws IOException, InterruptedException {
         ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findActiveResumen(username), ResumenDTO.class);
         resumenDTO.setNombreMes((resumenDTO.getNombreMes()));
 
@@ -28,18 +32,32 @@ public class ResumenServiceDTO {
              ) {
             itemDTO.setCategoria_desc(_CategoriaService.getDescripcion(itemDTO.getCategoria_id()));
         }
-
         return resumenDTO;
     }
 
-    public ResumenDTO findByFechaInicio(String username, LocalDate localDate) {
+    public List<ResumenDTO> findAllResumenes(String username) throws IOException, InterruptedException {
+        List<Resumen> resumenes = _resumenService.findAllResumenes(username);
+        List<ResumenDTO> resumenesDTO = new ArrayList<>();
+
+        for (Resumen resumen: resumenes){
+            ResumenDTO resumenDTO = _modelMapper.map(resumen, ResumenDTO.class);
+            resumenDTO.setNombreMes((resumenDTO.getNombreMes()));
+            resumenesDTO.add(resumenDTO);
+        }
+
+        return resumenesDTO;
+    }
+
+
+
+    public ResumenDTO findByFechaInicio(String username, LocalDate localDate) throws IOException, InterruptedException {
         ResumenDTO resumenDTO = _modelMapper.map(_resumenService.findResumenByFechaInicio(localDate, username)
                 , ResumenDTO.class);
         resumenDTO.setNombreMes(resumenDTO.getNombreMes());
         return resumenDTO;
     }
 
-    public ResumenDTO updateResuen(String username, LocalDate localDate, Float nuevoMonto){
+    public ResumenDTO updateResumen(String username, LocalDate localDate, Float nuevoMonto){
         return _modelMapper.map(_resumenService.updateResumen(username, localDate, nuevoMonto), ResumenDTO.class);
     }
 }

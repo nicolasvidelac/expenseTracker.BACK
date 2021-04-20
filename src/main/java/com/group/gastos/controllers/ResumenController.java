@@ -45,6 +45,17 @@ public class ResumenController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<Object> findAllResumenes(@RequestHeader(name = "Authorization") String token) {
+
+        try {
+            String username = getUsername(token);
+            return ResponseEntity.ok(_resumenServiceDTO.findAllResumenes(username));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
+        }
+    }
+
     @PatchMapping("/{year}/{month}")
     public ResponseEntity<Object> updateSueldo(@RequestHeader(name = "Authorization") String token,
                                                 @PathVariable("year") Integer year,
@@ -54,7 +65,7 @@ public class ResumenController {
         try {
             String username = getUsername(token);
             LocalDate fecha = LocalDate.now().withYear(year).withMonth(month);
-            return ResponseEntity.ok(_resumenServiceDTO.updateResuen(username, fecha, resumenDTO.getSueldoActual()));
+            return ResponseEntity.ok(_resumenServiceDTO.updateResumen(username, fecha, resumenDTO.getSueldoActual()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorMessage(e.getMessage(), e.getCause()));
         }
