@@ -23,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomUserDetailsService _registrationService;
     private final BCryptPasswordEncoder _BCPasswordEncoder;
 
-    private JwtFilter jwtFilter;
+    private final JwtFilter jwtFilter;
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(_registrationService);

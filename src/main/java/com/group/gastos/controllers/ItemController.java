@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 public class ItemController {
 
-    private ItemServiceDTO _itemServiceDTO;
-    private JwtToken jwtToken;
+    private final ItemServiceDTO _itemServiceDTO;
+    private final JwtToken jwtToken;
 
     @PostMapping
     public ResponseEntity<Object> saveItem(@RequestBody ItemDTO item, @RequestHeader(name = "Authorization") String token) {

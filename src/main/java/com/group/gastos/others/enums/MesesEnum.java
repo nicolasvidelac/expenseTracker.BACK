@@ -19,7 +19,7 @@ public enum MesesEnum {
 
     private final String label;
 
-    private MesesEnum(String label) {
+    MesesEnum(String label) {
         this.label = label;
     }
 }

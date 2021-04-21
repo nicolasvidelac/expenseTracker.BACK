@@ -1,5 +1,6 @@
 package com.group.gastos.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.modelmapper.internal.bytebuddy.utility.RandomString;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Item {
 
     private String id = RandomString.make(30);

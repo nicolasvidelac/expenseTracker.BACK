@@ -35,15 +35,15 @@ public class ResumenUtils {
         return  result;
     }
 
-    public void calculateGastoTotal(Resumen resumen){
+    public Float calculateGastoTotal(Resumen resumen) {
         AtomicReference<Float> totalGasto = new AtomicReference<>(0F);
         resumen.getItems().forEach(s -> {
-            if(s.getIsPesos()){
+            if (s.getIsPesos()) {
                 totalGasto.updateAndGet(v -> v + s.getMonto());
             } else {
                 totalGasto.updateAndGet(v -> v + s.getMonto() * resumen.getValorDolar());
             }
         });
-        resumen.setTotalGasto(totalGasto.get());
+        return totalGasto.get();
     }
 }

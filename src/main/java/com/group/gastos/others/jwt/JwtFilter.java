@@ -19,8 +19,8 @@ import java.io.IOException;
 @AllArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private JwtToken jwtToken;
-    private CustomUserDetailsService userDetailsService;
+    private final JwtToken jwtToken;
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(

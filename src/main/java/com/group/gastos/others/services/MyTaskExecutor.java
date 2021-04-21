@@ -2,6 +2,7 @@ package com.group.gastos.others.services;
 
 
 import com.group.gastos.services.Intefaces.ResumenService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -15,46 +16,42 @@ import java.util.logging.Logger;
 
 public class MyTaskExecutor {
     ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    @Autowired
     ResumenService myTask;
     volatile boolean isStopIssued;
 
-    public MyTaskExecutor(ResumenService myTask$)
-    {
-        myTask = myTask$;
-    }
-
-    public void startExecutionAt(int targetHour, int targetMin, int targetSec)
-    {
-        Runnable taskWrapper = new Runnable(){
+    public void startExecutionAt(int targetHour, int targetMin, int targetSec) {
+        Runnable taskWrapper = new Runnable() {
 
             @Override
-            public void run()
-            {
+            public void run() {
                 try {
-                    System.out.println("\n/nEL SERVICIO FUNCIONA\n/n");
-//                    myTask.setResumenInactive();
-//                    myTask.createNewResumenes();
+                    //                myTask.execute();
+                    System.out.println("\nEL PROGRAMA FUNCIONA A LAS " + LocalDateTime.now());
+                    TimeUnit.SECONDS.sleep(1);
                     startExecutionAt(targetHour, targetMin, targetSec);
-                } catch (Exception e){
-                    System.out.println("ERROR UNEXPECTED\n" + e);
+                } catch (Exception e) {
+                    System.out.println("\nERROR EN EL PROGRAMA" + e.getMessage() + e.getCause());
                 }
             }
-
         };
         long delay = computeNextDelay(targetHour, targetMin, targetSec);
         executorService.schedule(taskWrapper, delay, TimeUnit.SECONDS);
     }
 
-    private long computeNextDelay(int targetHour, int targetMin, int targetSec)
-    {
+    private long computeNextDelay(int targetHour, int targetMin, int targetSec) {
         LocalDateTime localNow = LocalDateTime.now();
         ZoneId currentZone = ZoneId.systemDefault();
         ZonedDateTime zonedNow = ZonedDateTime.of(localNow, currentZone);
         ZonedDateTime zonedNextTarget = zonedNow.withHour(targetHour).withMinute(targetMin).withSecond(targetSec);
-        if(zonedNow.compareTo(zonedNextTarget) > 0)
-            zonedNextTarget = zonedNextTarget.plusDays(1);
+        if (zonedNow.compareTo(zonedNextTarget) > 0)
+            System.out.println("entro al if");
+        zonedNextTarget = zonedNextTarget.plusMinutes(1);
+
+        System.out.println("Proxima ejecucion: " + zonedNextTarget.getHour() + ":" + zonedNextTarget.getMinute() + ":" + zonedNextTarget.getSecond());
 
         Duration duration = Duration.between(zonedNow, zonedNextTarget);
+        System.out.println(duration.getSeconds());
         return duration.getSeconds();
     }
 

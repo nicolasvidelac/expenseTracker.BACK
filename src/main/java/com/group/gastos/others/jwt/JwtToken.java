@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtToken {
-    private String secret = KeysEnum.encoding_key.getLabel();
+    private final String secret = KeysEnum.encoding_key.getLabel();
 
     public String getUsername(String token){
         return getClaim(token, Claims::getSubject);
